@@ -23,7 +23,9 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -62,6 +64,20 @@ public class UserManagement {
 		return repository.save(new User(username, encryptedPassword));
 	}
 
+
+	private Pageable createPageRequest(Integer pageNumber, Integer pageSize, Sort sort) {
+		return new PageRequest(pageNumber, pageSize, sort);
+	}
+
+//	private Pageable createPageRequest(Integer pageNumber, Integer pageSize) {
+//		return new PageRequest(pageNumber, pageSize);
+//	}
+
+
+
+
+
+
 	/**
 	 * Returns a {@link Page} of {@link User} for the given {@link Pageable}.
 	 * 
@@ -69,6 +85,17 @@ public class UserManagement {
 	 * @return
 	 */
 	public Page<User> findAll(Pageable pageable) {
+
+
+
+		if(pageable != null) {
+			Integer page = pageable.getPageNumber();
+			Integer size = pageable.getPageSize();
+
+			Sort sort = new Sort(Sort.Direction.DESC, "username");
+			createPageRequest(page, size, sort);
+			return repository.findAll(createPageRequest(page, size, sort));
+		}
 
 		Assert.notNull(pageable, "Pageable must not be null!");
 
